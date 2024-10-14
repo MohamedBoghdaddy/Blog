@@ -1,8 +1,8 @@
 import HeroSection from "./HeroSection";
-import StorytellingSection from "./BlogList";
-import CallToActionSection from "./SubscribeSection";
-import "../styles/Home.css";
-import WhoWeAre from "./WhoWeAre";
+import BlogList from "./BlogList";
+import FeaturedBlog from "./FeaturedBlogs"
+import PopularTags from "./PopularTags";
+import SubscribeSection from "./SubscribeSection";
 
 const Home = () => {
   return (
@@ -10,14 +10,14 @@ const Home = () => {
       <section id="hero-section">
         <HeroSection />
       </section>
-      <StorytellingSection />
+        <BlogList/>
       <section id="WhoWeAre">
-        <WhoWeAre />
+        <FeaturedBlog/>
       </section>
-      {/* <section id="contact">
-        <Contact />
-      </section> */}
-      <CallToActionSection />
+      <section id="contact">
+        <PopularTags/>
+      </section>
+        <SubscribeSection/>
     </div>
   );
 };

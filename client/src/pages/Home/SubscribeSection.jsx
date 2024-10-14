@@ -16,7 +16,7 @@ const SubscribeSection = () => {
     try {
       await axios.post("/api/subscribe", { email });
       setMessage("Subscription successful!");
-    } catch (error) {
+    } catch {
       setMessage("Error subscribing. Please try again.");
     }
   };

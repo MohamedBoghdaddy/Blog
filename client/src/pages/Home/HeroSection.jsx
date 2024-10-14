@@ -1,5 +1,3 @@
-import "../styles/HeroSection.css"; // Optional: Create specific styles
-
 const HeroSection = () => {
   return (
     <div className="hero-section">

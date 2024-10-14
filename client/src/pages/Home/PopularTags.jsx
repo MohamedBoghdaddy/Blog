@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import axios from "axios";
-import "../styles/PopularTags.css"; // Optional: Style for the tags section
 
 const PopularTags = () => {
   const [tags, setTags] = useState([]);

@@ -1,17 +1,18 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const BlogList = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [blogs, setBlogs] = useState([]); // Ensure it's an array
 
   useEffect(() => {
     // Fetch the latest blogs from your backend
     const fetchBlogs = async () => {
       try {
         const response = await axios.get("/api/blogs"); // Adjust API path
-        setBlogs(response.data);
+        setBlogs(Array.isArray(response.data) ? response.data : []); // Ensure data is an array
       } catch (error) {
         console.error("Error fetching blogs", error);
+        setBlogs([]); // Set blogs to an empty array on error
       }
     };
 

@@ -1,6 +1,5 @@
 import  { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/FeaturedBlogs.css"; // Optional: Style for the featured section
 
 const FeaturedBlogs = () => {
   const [featuredBlogs, setFeaturedBlogs] = useState([]);
