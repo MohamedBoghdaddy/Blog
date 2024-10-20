@@ -1,7 +1,6 @@
 // Import necessary models at the top of the file
 import Workspace from "../models/WorkspaceModel.js"; // Adjust the path as necessary
-import Document from "../models/DocumentModel.js"; // Adjust the path as necessary
-import User from "../models/UserModel.js"; // Adjust the path as necessary
+import Blog from "../models/BlogModel.js"; // Adjust the path as necessary
 
 export const getAnalytics = async (req, res) => {
   const { workspaceId } = req.params;
@@ -21,8 +20,8 @@ export const getAnalytics = async (req, res) => {
     // Count the total number of workspaces
     const workspaceCount = await Workspace.countDocuments({ deleted: false });
 
-    // Count the total number of documents in the workspace
-    const documentCount = await Document.countDocuments({
+    // Count the total number of blogs in the workspace
+    const blogCount = await Blog.countDocuments({
       workspace: workspaceId,
     });
 
@@ -34,7 +33,7 @@ export const getAnalytics = async (req, res) => {
 
     // Extract collaborators and ensure user data is valid
     const collaborators = populatedWorkspace.collaborators
-      .filter((c) => c.user && c.user.username && c.user.email) // Ensure user and its fields exist
+      .filter((c) => c.user?.username && c.user?.email) // Ensure user and its fields exist
       .map((c) => ({
         username: c.user.username,
         email: c.user.email,
@@ -49,7 +48,7 @@ export const getAnalytics = async (req, res) => {
     // Send analytics data in response
     res.status(200).json({
       workspaces: workspaceCount,
-      documents: documentCount,
+      blogs: blogCount,
       collaborators: uniqueCollaborators.length,
       collaboratorDetails: uniqueCollaborators,
     });

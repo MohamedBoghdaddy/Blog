@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useAuthContext } from "../context/AuthContext";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:4000";
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");

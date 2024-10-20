@@ -3,9 +3,10 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/UserModel.js";
 import multer from "multer";
-import path from "path";
+import path, { dirname } from "path"; // Fixed path imports
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import mongoose from "mongoose"; // Added mongoose import
+import Workspace from "../models/WorkspaceModel.js"; // Added Workspace model import
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(
       null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}` // eslint-disable-line
     );
   },
 });
@@ -38,7 +39,7 @@ export const register = async (req, res) => {
     username,
     email,
     password,
-    nid, 
+    nid,
     firstName,
     middleName,
     lastName,
@@ -112,8 +113,6 @@ export const login = async (req, res) => {
 
     const token = createToken(user);
 
-
-
     res.status(200).json({
       token,
       user: { _id: user._id, username: user.username, email: user.email },
@@ -133,7 +132,6 @@ export const logoutUser = async (req, res) => {
     res.status(500).json({ message: "Logout failed" });
   }
 };
-
 
 export const getUser = async (req, res) => {
   try {
@@ -236,8 +234,8 @@ export const fetchCollaborators = async (req, res) => {
     }
 
     const workspace = await Workspace.findById(workspaceId).populate({
-      path: "collaborators", 
-      select: "username email", 
+      path: "collaborators",
+      select: "username email",
     });
 
     if (!workspace) {
@@ -247,9 +245,9 @@ export const fetchCollaborators = async (req, res) => {
     res.status(200).json(workspace.collaborators);
   } catch (error) {
     console.error("Error fetching collaborators:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch collaborators", error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch collaborators",
+      error: error.message,
+    });
   }
 };
-

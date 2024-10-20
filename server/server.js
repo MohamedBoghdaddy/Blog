@@ -5,15 +5,15 @@ import cors from "cors";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import multer from "multer";
-import connectMongoDBSession from "connect-mongodb-session";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
 import userRoutes from "./routes/userroutes.js";
 import workspaceRoutes from "./routes/workspaceRoutes.js";
-import documentRoutes from "./routes/documentRoutes.js";
-import User from "./models/UserModel.js";
+import blogRoutes from "./routes/BlogRoutes.js"; // Renamed from documentRoutes to blogRoutes
 import analyticRoutes from "./routes/analyticRoutes.js";
+import connectMongoDBSession from "connect-mongodb-session"; // Grouped imports together
+
 // Resolving __dirname for ES Module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,17 +42,15 @@ const store = new MongoDBStore({
 
 mongoose
   .connect(MONGO_URL)
-  .then(() => {
-    console.log("MongoDB connected successfully");
-  })
+  .then(() => console.log("MongoDB connected successfully"))
   .catch((error) => {
     console.error("Database connection error:", error);
     process.exit(1);
   });
 
-store.on("error", (error) => {
-  console.error("MongoDB session store error:", error);
-});
+store.on("error", (error) =>
+  console.error("MongoDB session store error:", error)
+);
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -67,20 +65,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-const createToken = (_id, res) => {
-  const token = jwt.sign({ _id }, JWT_SECRET, {
-    expiresIn: "7d",
-  });
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: false, // Set to true in production
-    sameSite: "strict",
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-  });
-
-  return token;
-};
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Middleware to verify JWT tokens for protected routes
 const verifyToken = (req, res, next) => {
@@ -98,16 +85,13 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
+// API Routes
 app.use("/api/users", userRoutes);
 app.use("/api/workspaces", workspaceRoutes);
-app.use("/api/documents", documentRoutes);
-app.use("/api/analytic", analyticRoutes);
+app.use("/api/blogs", blogRoutes); // Changed to blog routes
+app.use("/api/analytics", analyticRoutes);
 
-analyticRoutes;
+// Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something went wrong!");
@@ -116,11 +100,12 @@ app.use((err, req, res, next) => {
 // Serve the client app
 app.use(express.static(path.join(__dirname, "../client/build")));
 
-// Render client for any path
+// Render client for any path not handled by API routes
 app.get("*", (req, res) =>
   res.sendFile(path.join(__dirname, "../client/build/index.html"))
 );
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -2,21 +2,26 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import NavBar from "./pages/Home/Navbar";
 import Footer from "./pages/Home/Footer";
+import NotFound from "./pages/NotFound/NotFound"; // Create a NotFound page component for undefined routes
+
 export default function App() {
   return (
     <BrowserRouter>
+      {/* NavBar is common across all routes */}
+      <NavBar />
+
       <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <NavBar />
-              <Home />
-              <Footer />
-            </>
-          }
-        />
+        <Route path="/" element={<Home />} />
+
+        {/* Add more routes here as needed */}
+        {/* Example: <Route path="/about" element={<About />} /> */}
+
+        {/* Catch-all route for undefined paths */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {/* Footer is common across all routes */}
+      <Footer />
     </BrowserRouter>
   );
 }

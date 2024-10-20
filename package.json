@@ -1,0 +1,90 @@
+{
+  "name": "Blog",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@nextui-org/react": "^2.4.8",
+    "@nextui-org/spinner": "^2.0.34",
+    "@nextui-org/system": "^2.2.6",
+    "@nextui-org/theme": "^2.2.11",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "assert": "^2.1.0",
+    "Blog": "file:",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "browserify-zlib": "^0.2.0",
+    "chart.js": "^4.4.4",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "framer-motion": "^11.5.6",
+    "https-browserify": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
+    "mammoth": "^1.8.0",
+    "pg": "^8.12.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1",
+    "react-file-input-previews-base64": "^1.0.8",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^5.3.0",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.26.1",
+    "react-scripts": "^5.0.1",
+    "react-scroll": "^1.9.0",
+    "react-simple-maps": "^3.0.0",
+    "react-toastify": "^10.0.5",
+    "reactstrap": "^9.2.2",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "tailwindcss": "^3.4.12",
+    "url": "^0.11.4",
+    "util": "^0.12.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "vite-build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "start": "react-scripts start --watch",
+    "cra-build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4"
+  }
+}

@@ -18,7 +18,7 @@ export const createWorkspace = async (req, res) => {
     const newWorkspace = new Workspace({
       name,
       description,
-      user: userId, 
+      user: userId,
     });
 
     await newWorkspace.save();
