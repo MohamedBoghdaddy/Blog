@@ -7,6 +7,8 @@ import {
   useMemo,
 } from "react";
 import axios from "axios";
+import PropTypes from "prop-types"; // Importing PropTypes
+import { authReducer } from "./authReducer"; // Import the reducer from a new file
 
 const AuthContext = createContext();
 
@@ -14,30 +16,6 @@ const initialState = {
   user: null,
   isAuthenticated: false,
   loading: true,
-};
-
-const authReducer = (state, action) => {
-  switch (action.type) {
-    case "LOGIN_SUCCESS":
-    case "USER_LOADED":
-      return {
-        ...state,
-        user: action.payload,
-        isAuthenticated: true,
-        loading: false,
-      };
-    case "LOGOUT_SUCCESS":
-      return {
-        ...state,
-        user: null,
-        isAuthenticated: false,
-        loading: false,
-      };
-    case "AUTH_ERROR":
-      return { ...state, user: null, isAuthenticated: false, loading: false };
-    default:
-      return state;
-  }
 };
 
 export const AuthProvider = ({ children }) => {
@@ -122,6 +100,11 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
+};
+
+// PropTypes validation for children
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useAuthContext = () => {
