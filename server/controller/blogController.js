@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import Blog from "../models/BlogModel.js";
-import Workspace from "../models/WorkspaceModel.js"; // Import the Workspace model
+import Workspace from "../models/WorkspaceModel.js";
 
 // Fix __dirname issue in ES module
 const __filename = fileURLToPath(import.meta.url);
@@ -120,6 +120,34 @@ export const restoreBlog = async (req, res) => {
   }
 };
 
+export const downloadBlog = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog || blog.deleted) {
+      return res
+        .status(404)
+        .json({ message: "Blog not found or has been deleted" });
+    }
+
+    if (blog.owner.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "You do not have permission to access this Blog",
+      });
+    }
+
+    if (!fs.existsSync(blog.url)) {
+      return res.status(404).json({ message: "File not found on server" });
+    }
+
+    return res.download(blog.url, blog.name);
+  } catch (error) {
+    console.error("Error downloading blog:", error);
+    return res.status(500).json({ message: "Blog download failed", error });
+  }
+};
+
+// New: List Blogs in Workspace
 export const listBlogInWorkspace = async (req, res) => {
   try {
     const { workspaceId } = req.params;
@@ -148,148 +176,7 @@ export const listBlogInWorkspace = async (req, res) => {
   }
 };
 
-export const downloadBlog = async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog || blog.deleted) {
-      return res
-        .status(404)
-        .json({ message: "Blog not found or has been deleted" });
-    }
-
-    if (blog.owner.toString() !== req.user.id) {
-      return res.status(403).json({
-        message: "You do not have permission to access this Blog",
-      });
-    }
-
-    if (!fs.existsSync(blog.url)) {
-      return res.status(404).json({ message: "File not found on server" });
-    }
-
-    return res.download(blog.url, blog.name);
-  } catch (error) {
-    console.error("Error downloading blog:", error);
-    return res.status(500).json({ message: "Blog download failed", error });
-  }
-};
-
-export const previewBlog = async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog || blog.deleted) {
-      return res
-        .status(404)
-        .json({ message: "Blog not found or has been deleted" });
-    }
-
-    if (blog.owner.toString() !== req.user.id) {
-      return res.status(403).json({
-        message: "You do not have permission to preview this Blog",
-      });
-    }
-
-    if (!fs.existsSync(blog.url)) {
-      return res.status(404).json({ message: "File not found on server" });
-    }
-
-    const fileType = blog.type;
-    const filePath = blog.url;
-    const fileName = blog.name;
-
-    const supportedPreviewTypes = [
-      "image/",
-      "application/pdf",
-      "video/",
-      "audio/",
-      "text/",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-
-    const isPreviewSupported = supportedPreviewTypes.some((type) =>
-      fileType.startsWith(type)
-    );
-
-    if (!isPreviewSupported) {
-      return res.status(200).json({
-        message:
-          "Preview not supported. Use the download link to view the blog.",
-        downloadUrl: `http://localhost:4000/api/blog/download/${req.params.id}`,
-        isPreviewSupported,
-      });
-    }
-
-    const base64Data = fs.readFileSync(filePath, { encoding: "base64" });
-
-    return res.json({
-      fileType,
-      base64: base64Data,
-      fileName,
-      isPreviewSupported,
-    });
-  } catch (error) {
-    console.error("Error previewing blog:", error);
-    return res.status(500).json({ message: "Blog preview failed", error });
-  }
-};
-
-export const updateBlogMetadata = async (req, res) => {
-  try {
-    const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.json(blog);
-  } catch (err) {
-    res.status(500).json({ error: "Error updating metadata" });
-  }
-};
-
-export const updateBlogTags = async (req, res) => {
-  try {
-    const { tags } = req.body;
-    const blog = await Blog.findByIdAndUpdate(
-      req.params.id,
-      { tags },
-      { new: true }
-    );
-    res.json(blog);
-  } catch (err) {
-    res.status(500).json({ error: "Error updating tags" });
-  }
-};
-
-export const updateBlog = async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
-    }
-
-    const workspace = await Workspace.findById(blog.workspace);
-    const isUser = workspace.user.toString() === req.user._id.toString();
-    const isCollaborator = workspace.collaborators.some(
-      (collaborator) => collaborator.user.toString() === req.user._id.toString()
-    );
-
-    if (!isUser && !isCollaborator) {
-      return res.status(403).json({
-        message: "You do not have permission to update this Blog",
-      });
-    }
-
-    blog.name = req.body.name || blog.name;
-    await blog.save();
-
-    return res.status(200).json(blog);
-  } catch (error) {
-    console.error("Error updating blog:", error);
-    return res.status(500).json({ message: "Blog update failed", error });
-  }
-};
-
+// New: Search Blogs
 export const searchBlogs = async (req, res) => {
   try {
     const { metadata, tags, name } = req.query;
