@@ -209,7 +209,7 @@ const DashboardProvider = ({ children }) => {
     );
   }, [blogs, searchTerm]);
 
-  const searchPublicWorkspaces = useCallback(async (term) => {
+  const searchPublicBlogs = useCallback(async (term) => {
     try {
       const response = await axios.get(
         `http://localhost:4000/api/workspaces/search?q=${term}`,
@@ -241,7 +241,7 @@ const DashboardProvider = ({ children }) => {
       deleteWorkspace,
       fetchWorkspacesByUser,
       fetchBlogs,
-      searchPublicWorkspaces,
+      searchPublicBlogs,
       uploadBlog,
       restoreBlog,
       previewFile,
@@ -267,7 +267,7 @@ const DashboardProvider = ({ children }) => {
       deleteWorkspace,
       fetchWorkspacesByUser,
       fetchBlogs,
-      searchPublicWorkspaces,
+      searchPublicBlogs,
       uploadBlog,
       restoreBlog,
       previewFile,
