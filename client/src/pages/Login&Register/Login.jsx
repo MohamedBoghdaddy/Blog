@@ -61,9 +61,8 @@ const Login = () => {
             </button>
           </form>
         </div>
-
         <div className="right-login">
-          <h1>Don't have an account?</h1>
+          <h1>Don&apos;t have an account?</h1> 
           <Link to="/signup">
             <button className="right_btn" type="button" disabled={isLoading}>
               Signup
