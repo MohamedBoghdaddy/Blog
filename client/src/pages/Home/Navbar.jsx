@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
@@ -6,37 +6,46 @@ import logo from "../assets/images/logo.png"; // Adjust path as per your project
 import Login from "../Login&Register/Login.jsx"; // Adjust path to Login component
 import { useAuthContext } from "../../../context/AuthContext";
 import { useLogout } from "../../../hooks/useLogout.js";
-import axios from "axios";
-import { DashboardContext } from "../../../context/DashboardContext"; // Import the DashboardContext
+import { DashboardContext } from "../../context/DashboardContext.jsx"; // Import the DashboardContext
 
 const NavBar = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); // New state to capture search term
-  const { searchPublicWorkspaces } = useContext(DashboardContext); // Fetch search function from context
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState(""); // State to capture search term
   const { state } = useAuthContext();
-
-  const { user, isAuthenticated } = state;
+  const navigate = useNavigate();
   const { logout } = useLogout();
+  const { user, isAuthenticated } = state;
+  const { searchBlogs } = useContext(DashboardContext); // Fetch search function from context
 
+  // Open login modal
   const handleLoginModalOpen = () => {
     setShowLoginModal(true);
   };
 
+  // Close login modal
   const handleLoginModalClose = () => {
     setShowLoginModal(false);
   };
 
+  // Handle logout
   const handleLogout = async () => {
     logout();
     navigate("/");
   };
 
+  // Handle search submit
   const handleSearchSubmit = (e) => {
     e.preventDefault(); // Prevent page reload
     if (searchTerm) {
-      navigate(`/workspaces?term=${searchTerm}`);
+      searchBlogs(searchTerm); // Call the searchBlogs function from context
+      navigate(`/Blogs?term=${searchTerm}`); // Optionally navigate to a page showing the results
     }
+  };
+
+  // Handle Nav Collapse for mobile toggle
+  const handleNavCollapse = () => {
+    // Logic to collapse the nav (could be a toggle for a mobile view)
+    setShowLoginModal(false); // Just an example, adjust as per your logic
   };
 
   return (
@@ -65,37 +74,54 @@ const NavBar = () => {
 
       <div className="flex items-center space-x-4">
         {/* Conditional rendering based on authentication */}
-        {isAuthenticated ? (
-          <button
+        {isAuthenticated && user ? (
+          <div
+            className="nav-link"
+            role="button"
+            tabIndex="0"
             onClick={handleLogout}
-            className="text-white hover:text-gray-300 flex items-center space-x-2"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                handleLogout();
+              }
+            }}
           >
-            <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-            <span>Logout</span>
-          </button>
+            <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+          </div>
         ) : (
-          <button
-            onClick={handleLoginModalOpen}
-            className="text-white hover:text-gray-300 flex items-center space-x-2"
+          <div
+            className="nav-link"
+            role="button"
+            tabIndex="0"
+            onClick={() => {
+              handleLoginModalOpen();
+              handleNavCollapse();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                handleLoginModalOpen();
+                handleNavCollapse();
+              }
+            }}
           >
-            <FontAwesomeIcon icon={faUser} className="mr-2" />
-            <span>Login</span>
-          </button>
+            <FontAwesomeIcon icon={faUser} />
+          </div>
         )}
 
-        <form onSubmit={handleSearchSubmit} className="flex">
+        <form onSubmit={handleSearchSubmit} className="d-flex" role="search">
           <input
-            type="text"
-            className="px-3 py-2 rounded-lg text-black"
+            className="form-control me-2 px-3 py-2 rounded-lg text-black"
+            type="search"
             placeholder="Search"
+            aria-label="Search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
+            className="btn btn-outline-success ml-2 bg-blue-500 text-white px-3 py-2 rounded-lg"
             type="submit"
-            className="ml-2 bg-blue-500 text-white px-3 py-2 rounded-lg"
           >
-            Submit
+            Search
           </button>
         </form>
       </div>
