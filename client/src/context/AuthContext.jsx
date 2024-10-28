@@ -8,7 +8,7 @@ import {
 } from "react";
 import axios from "axios";
 import PropTypes from "prop-types"; // Importing PropTypes
-import { authReducer } from "./authReducer"; // Import the reducer from a new file
+import { authReducer } from "./authreducer.jsx"; // Import the reducer from a new file
 
 const AuthContext = createContext();
 
