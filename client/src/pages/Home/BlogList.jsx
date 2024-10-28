@@ -20,17 +20,25 @@ const BlogList = () => {
   }, []);
 
   return (
-    <div className="blog-list">
+    <div className="blog-list my-10">
       {blogs.length > 0 ? (
         blogs.map((blog) => (
-          <div key={blog._id} className="blog-preview">
-            <h3>{blog.title}</h3>
-            <p>{blog.excerpt}</p>
-            <a href={`/blog/${blog._id}`}>Read more</a>
+          <div
+            key={blog._id}
+            className="blog-preview bg-white shadow-md rounded-lg p-4 mb-6"
+          >
+            <h3 className="text-xl font-semibold">{blog.title}</h3>
+            <p className="text-gray-700">{blog.excerpt}</p>
+            <a
+              href={`/blog/${blog._id}`}
+              className="text-blue-500 hover:underline"
+            >
+              Read more
+            </a>
           </div>
         ))
       ) : (
-        <p>No blogs available</p>
+        <p className="text-center text-gray-500">No blogs available</p>
       )}
     </div>
   );
