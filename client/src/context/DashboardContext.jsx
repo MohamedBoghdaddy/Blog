@@ -8,7 +8,7 @@ import {
 import PropTypes from "prop-types";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuthContext } from "./AuthContext";
+import { useAuthContext } from "./AuthContext.jsx"; // Ensure .jsx extension is added
 
 export const DashboardContext = createContext();
 
@@ -19,7 +19,7 @@ const DashboardProvider = ({ children }) => {
   // State variables
   const [loading, setLoading] = useState(true);
   const [workspaces, setWorkspaces] = useState([]);
-  const [blogs, setBlogs] = useState([]); // Changed to manage blogs
+  const [blogs, setBlogs] = useState([]);
   const [recycleBin, setRecycleBin] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [previewFile, setPreviewFile] = useState(null);
@@ -61,7 +61,7 @@ const DashboardProvider = ({ children }) => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/workspaces/${user?._id}`, // Optional chaining
+        `http://localhost:4000/api/workspaces/${user?._id}`,
         { withCredentials: true }
       );
       setWorkspaces(response.data || []);
@@ -290,4 +290,5 @@ DashboardProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+// Export the DashboardProvider component
 export default DashboardProvider;
