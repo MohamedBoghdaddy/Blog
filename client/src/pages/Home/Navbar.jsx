@@ -2,10 +2,10 @@ import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
-import logo from "../assets/images/logo.png"; // Adjust path as per your project
+import logo from "../../assets/images/logo.jpeg"; // Adjust path as per your project
 import Login from "../Login&Register/Login.jsx"; // Adjust path to Login component
-import { useAuthContext } from "../../../context/AuthContext";
-import { useLogout } from "../../../hooks/useLogout.js";
+import { useAuthContext } from "../../context/AuthContext.jsx";
+import { useLogout } from "../../hooks/useLogout.js";
 import { DashboardContext } from "../../context/DashboardContext.jsx"; // Import the DashboardContext
 
 const NavBar = () => {
