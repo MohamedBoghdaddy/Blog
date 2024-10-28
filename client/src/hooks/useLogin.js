@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import { useAuthContext } from "../context/AuthContext";
+import { useAuthContext } from "../context/AuthContext.jsx";
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const apiUrl =  "http://localhost:4000";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
