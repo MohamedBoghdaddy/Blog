@@ -1,16 +1,12 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
-import { AuthProvider } from "./context/AuthContext";
-import DashboardProvider from "./context/DashboardContext";
-import "bootstrap/dist/css/bootstrap.min.css";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx"; // Added .jsx extension
+import reportWebVitals from "./reportWebVitals.js"; // Added .jsx extension
+import { AuthProvider } from "./context/AuthContext.jsx"; // Added .jsx extension
+import DashboardProvider from './context/DashboardContext.jsx'; // Adjust import to match the export
+import "./index.css";
 
-// Create a root container
-const container = document.getElementById("root");
-const root = createRoot(container);
-
-// Render the App component
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <AuthProvider>
@@ -18,9 +14,7 @@ root.render(
         <App />
       </DashboardProvider>
     </AuthProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
-
 
 reportWebVitals();
