@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
 import { useSignup } from "../../hooks/useSignup";
+import { useDispatch } from "react-redux"; // Import useDispatch
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../../redux/user/userSlice.js"; // Import Redux actions
 
 const Signup = () => {
   const {
@@ -23,13 +29,27 @@ const Signup = () => {
     handleSignup,
   } = useSignup();
 
+  const reduxDispatch = useDispatch(); // Initialize Redux dispatch
+
+  const handleSignupWithRedux = async (e) => {
+    e.preventDefault();
+    reduxDispatch(signInStart()); // Dispatch signInStart action for loading state
+
+    try {
+      await handleSignup(e); // Call the existing handleSignup function
+      reduxDispatch(signInSuccess({ username, email })); // Dispatch success with user data
+    } catch (error) {
+      reduxDispatch(signInFailure(error.message)); // Dispatch failure on error
+    }
+  };
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-gray-200 p-5 box-border">
       <div className="max-w-3xl w-full flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden">
         {/* Left Signup Section */}
         <div className="flex-1 flex flex-col items-center justify-center p-10 bg-gray-100">
           <h2 className="text-4xl text-gray-800 mb-5 font-semibold">Signup</h2>
-          <form onSubmit={handleSignup} className="w-full">
+          <form onSubmit={handleSignupWithRedux} className="w-full">
             {/* Username Input */}
             <div className="mb-4">
               <label
