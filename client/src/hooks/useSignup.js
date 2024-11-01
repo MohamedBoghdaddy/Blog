@@ -1,8 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux"; // Import useDispatch
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice.js"; // Import Redux actions
 import { useAuthContext } from "../context/AuthContext.jsx";
 
-const apiUrl =  "http://localhost:4000";
+const apiUrl = "http://localhost:4000";
 
 export const useSignup = () => {
   const [username, setUsername] = useState("");
@@ -12,7 +18,6 @@ export const useSignup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [gender, setGender] = useState("");
-  const [nid, setNid] = useState("");
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -20,6 +25,7 @@ export const useSignup = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { dispatch } = useAuthContext();
+  const reduxDispatch = useDispatch(); // Initialize Redux dispatch
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -33,6 +39,8 @@ export const useSignup = () => {
       return;
     }
 
+    reduxDispatch(signInStart()); // Dispatch signInStart action for loading state
+
     try {
       const response = await axios.post(
         `${apiUrl}/api/users/signup`,
@@ -41,7 +49,6 @@ export const useSignup = () => {
           email,
           password,
           gender,
-          nid,
           firstName,
           middleName,
           lastName,
@@ -55,7 +62,8 @@ export const useSignup = () => {
       localStorage.setItem("user", JSON.stringify({ user }));
 
       // Dispatch signup success
-      dispatch({ type: "REGISTRATION_SUCCESS", payload: user });
+      reduxDispatch(signInSuccess(user)); // Dispatch success with user data
+      dispatch({ type: "REGISTRATION_SUCCESS", payload: user }); // Optionally dispatch another success action
 
       setSuccessMessage("Registration successful");
     } catch (error) {
@@ -63,6 +71,7 @@ export const useSignup = () => {
       setErrorMessage(
         error.response?.data?.message || "Signup failed. Please try again."
       );
+      reduxDispatch(signInFailure(error.response?.data?.message)); // Dispatch failure on error
     } finally {
       setIsLoading(false);
     }
@@ -83,8 +92,6 @@ export const useSignup = () => {
     setShowConfirmPassword,
     gender,
     setGender,
-    nid,
-    setNid,
     firstName,
     setFirstName,
     middleName,
