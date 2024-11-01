@@ -1,8 +1,13 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import { useAuthContext } from "../context/AuthContext.jsx";
+import { useDispatch } from "react-redux"; // Import useDispatch from react-redux
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice.js";
 
-const apiUrl =  "http://localhost:4000";
+const apiUrl = "http://localhost:4000";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
@@ -10,13 +15,13 @@ export const useLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { dispatch } = useAuthContext();
+
+  const reduxDispatch = useDispatch(); // Use Redux dispatch
 
   const handleLogin = useCallback(
     async (e) => {
       e.preventDefault();
-      setIsLoading(true);
+      reduxDispatch(signInStart()); // Dispatch signInStart action
       setErrorMessage("");
       setSuccessMessage("");
 
@@ -38,7 +43,7 @@ export const useLogin = () => {
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
           // Dispatch login success
-          dispatch({ type: "LOGIN_SUCCESS", payload: user });
+          reduxDispatch(signInSuccess(user)); // Dispatch signInSuccess action
 
           setSuccessMessage("Login successful");
         } else {
@@ -49,12 +54,12 @@ export const useLogin = () => {
         setErrorMessage(
           error.response?.data?.message || "Login failed. Please try again."
         );
-        dispatch({ type: "AUTH_ERROR" });
+        reduxDispatch(signInFailure(error.response?.data?.message)); // Dispatch signInFailure action with error message
       } finally {
-        setIsLoading(false);
+        // The loading state is now managed by Redux
       }
     },
-    [email, password, dispatch]
+    [email, password, reduxDispatch]
   );
 
   return {
@@ -66,7 +71,6 @@ export const useLogin = () => {
     setShowPassword,
     errorMessage,
     successMessage,
-    isLoading,
     handleLogin,
   };
 };

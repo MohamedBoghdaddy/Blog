@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
 import { useLogin } from "../../hooks/useLogin";
+import { useDispatch } from "react-redux"; // Import useDispatch
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../../redux/user/userSlice.js"; // Import Redux actions
 
 const Login = () => {
   const {
@@ -15,6 +21,20 @@ const Login = () => {
     handleLogin,
   } = useLogin();
 
+  const reduxDispatch = useDispatch(); // Initialize Redux dispatch
+
+  const handleLoginWithRedux = async (e) => {
+    e.preventDefault();
+    reduxDispatch(signInStart()); // Dispatch signInStart action for loading state
+
+    try {
+      await handleLogin(e); // Call the existing handleLogin function
+      reduxDispatch(signInSuccess({ email })); // Dispatch success with user email
+    } catch (error) {
+      reduxDispatch(signInFailure(error.message)); // Dispatch failure on error
+    }
+  };
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-gray-200 p-5 box-border">
       <div className="max-w-5xl w-full flex flex-col md:flex-row bg-gray-800 rounded-lg shadow-lg overflow-hidden">
@@ -23,7 +43,7 @@ const Login = () => {
           <h2 className="text-4xl text-gray-800 mb-5 font-semibold">Login</h2>
 
           {/* Form Start */}
-          <form className="w-full" onSubmit={handleLogin}>
+          <form className="w-full" onSubmit={handleLoginWithRedux}>
             {/* Email Field */}
             <div className="mb-4 flex items-center">
               <label
@@ -92,7 +112,7 @@ const Login = () => {
         {/* Right Section (Signup Prompt) */}
         <div className="flex-1 flex flex-col items-center justify-center p-10 bg-gray-800 text-white">
           <h1 className="text-4xl font-semibold mb-5">
-            Don't have an account?
+            Don&apos;t have an account?
           </h1>
           <Link to="/signup">
             <button
