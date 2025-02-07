@@ -1,37 +1,36 @@
 import express from "express";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
+import path from "path";
+import compression from "compression";
+import helmet from "helmet";
 import cors from "cors";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import session from "express-session";
-import path from "path";
 import { fileURLToPath } from "url";
+import connectMongoDBSession from "connect-mongodb-session";
 import userRoutes from "./routes/userroutes.js";
 import workspaceRoutes from "./routes/workspaceRoutes.js";
-import blogRoutes from "./routes/BlogRoutes.js"; // Renamed from documentRoutes to blogRoutes
+import blogRoutes from "./routes/BlogRoutes.js";
 import analyticRoutes from "./routes/analyticRoutes.js";
-import connectMongoDBSession from "connect-mongodb-session"; // Grouped imports together
-
-// Resolving __dirname for ES Module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 dotenv.config();
+
+// Resolving __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
 const MongoDBStore = connectMongoDBSession(session);
 const JWT_SECRET = process.env.JWT_SECRET;
-
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO_URL;
 
 if (!MONGO_URL) {
-  console.error(
-    "MongoDB connection string (MONGO_URL) is not defined in the environment variables."
-  );
+  console.error("MongoDB connection string (MONGO_URL) is missing.");
   process.exit(1);
 }
 
@@ -52,24 +51,32 @@ store.on("error", (error) =>
   console.error("MongoDB session store error:", error)
 );
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (/^http:\/\/localhost:\d+$/.test(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-};
+// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://your-deployed-domain.com",
+];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-app.use(cors(corsOptions));
+// Middleware
+app.use(helmet());
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Middleware to verify JWT tokens for protected routes
+// JWT Authentication Middleware
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
   if (!token) {
@@ -88,7 +95,7 @@ const verifyToken = (req, res, next) => {
 // API Routes
 app.use("/api/users", userRoutes);
 app.use("/api/workspaces", workspaceRoutes);
-app.use("/api/blogs", blogRoutes); // Changed to blog routes
+app.use("/api/blogs", blogRoutes);
 app.use("/api/analytics", analyticRoutes);
 
 // Global error handler
