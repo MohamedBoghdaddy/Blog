@@ -1,34 +1,45 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home/Home";
-import NavBar from "./pages/Home/Navbar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react";
+import Navbar from "./pages/Home/Navbar";
 import Footer from "./pages/Home/Footer";
-// Uncomment and create a NotFound page component for undefined routes
-// import NotFound from "./pages/NotFound/NotFound";
-import Blog from "./pages/Blog/Blog";
-import Login from "./pages/Login&Register/Login.jsx"; // Ensure correct path to Login component
-import Register from "./pages/Login&Register/signup.jsx"; // Ensure correct path to Register component
+import NotificationIcon from "./components/NotificationIcon";
+import { AuthProvider } from "./context/AuthContext";
+import DashboardProvider from "./context/DashboardContext";
 
-export default function App() {
+// Lazy loading for better performance
+const Home = lazy(() => import("./pages/Home/Home"));
+const Blog = lazy(() => import("./pages/Blog/Blog"));
+const Login = lazy(() => import("./pages/Login&Register/Login"));
+const Signup = lazy(() => import("./pages/Login&Register/Signup"));
+const Profile = lazy(() => import("./pages/profile/Profile")); // Fixed typo
+const Forum = lazy(() => import("./pages/Forum/forum"));
+
+const App = () => {
   return (
-    <BrowserRouter>
-      {/* NavBar is common across all routes */}
-      <NavBar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/login" element={<Login />} /> {/* Add Login route */}
-        <Route path="/signup" element={<Register />} />{" "}
-        {/* Add Register route */}
-        {/* Add more routes here as needed */}
-        {/* Example: <Route path="/about" element={<About />} /> */}
-        {/* Catch-all route for undefined paths */}
-        {/* Uncomment the following line to use the NotFound page */}
-        {/* <Route path="*" element={<NotFound />} /> */}
-      </Routes>
-
-      {/* Footer is common across all routes */}
-      <Footer />
-    </BrowserRouter>
+    <AuthProvider>
+      <DashboardProvider>
+        <Router>
+          <div className="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-200">
+            <Navbar />
+            <NotificationIcon />
+            <Suspense
+              fallback={<div className="text-center my-10">Loading...</div>}
+            >
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/blog/:id" element={<Blog />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/forum" element={<Forum />} />
+              </Routes>
+            </Suspense>
+            <Footer />
+          </div>
+        </Router>
+      </DashboardProvider>
+    </AuthProvider>
   );
-}
+};
+
+export default App;
