@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux"; // Import useDispatch from react-redux
+import { useDispatch } from "react-redux";
 import {
   signInStart,
   signInSuccess,
@@ -10,40 +10,43 @@ import {
 const apiUrl = "http://localhost:4000";
 
 export const useLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const reduxDispatch = useDispatch();
 
-  const reduxDispatch = useDispatch(); // Use Redux dispatch
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleLogin = useCallback(
     async (e) => {
       e.preventDefault();
-      reduxDispatch(signInStart()); // Dispatch signInStart action
+      reduxDispatch(signInStart());
       setErrorMessage("");
       setSuccessMessage("");
 
       try {
         const response = await axios.post(
           `${apiUrl}/api/users/login`,
-          { email, password },
+          formData,
           { withCredentials: true }
         );
 
         const { token, user } = response.data;
 
         if (token && user) {
-          // Store token and user in localStorage
           localStorage.setItem("token", token);
-          localStorage.setItem("user", JSON.stringify({ token, user }));
+          localStorage.setItem("user", JSON.stringify(user));
 
-          // Set Authorization header
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-          // Dispatch login success
-          reduxDispatch(signInSuccess(user)); // Dispatch signInSuccess action
+          reduxDispatch(signInSuccess(user));
 
           setSuccessMessage("Login successful");
         } else {
@@ -54,19 +57,15 @@ export const useLogin = () => {
         setErrorMessage(
           error.response?.data?.message || "Login failed. Please try again."
         );
-        reduxDispatch(signInFailure(error.response?.data?.message)); // Dispatch signInFailure action with error message
-      } finally {
-        // The loading state is now managed by Redux
+        reduxDispatch(signInFailure(error.response?.data?.message));
       }
     },
-    [email, password, reduxDispatch]
+    [formData, reduxDispatch]
   );
 
   return {
-    email,
-    setEmail,
-    password,
-    setPassword,
+    ...formData,
+    handleChange,
     showPassword,
     setShowPassword,
     errorMessage,
