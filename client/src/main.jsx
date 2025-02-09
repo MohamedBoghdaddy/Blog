@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <PersistGate loading={null} persistor={persistor}>
         <AuthProvider>
           <DashboardProvider>
-              <App />
+            <App />
           </DashboardProvider>
         </AuthProvider>
       </PersistGate>
