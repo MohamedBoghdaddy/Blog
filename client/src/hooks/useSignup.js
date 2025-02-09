@@ -1,31 +1,39 @@
 import { useState } from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux"; // Import useDispatch
+import { useDispatch } from "react-redux";
 import {
   signInStart,
   signInSuccess,
   signInFailure,
-} from "../redux/user/userSlice.js"; // Import Redux actions
+} from "../redux/user/userSlice.js";
 import { useAuthContext } from "../context/AuthContext.jsx";
 
 const apiUrl = "http://localhost:4000";
 
 export const useSignup = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    gender: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [gender, setGender] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const { dispatch } = useAuthContext();
-  const reduxDispatch = useDispatch(); // Initialize Redux dispatch
+  const reduxDispatch = useDispatch();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -33,37 +41,26 @@ export const useSignup = () => {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setErrorMessage("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
-    reduxDispatch(signInStart()); // Dispatch signInStart action for loading state
+    reduxDispatch(signInStart());
 
     try {
       const response = await axios.post(
         `${apiUrl}/api/users/signup`,
-        {
-          username,
-          email,
-          password,
-          gender,
-          firstName,
-          middleName,
-          lastName,
-        },
+        formData,
         { withCredentials: true }
       );
 
       const { user } = response.data;
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // Store user in local storage
-      localStorage.setItem("user", JSON.stringify({ user }));
-
-      // Dispatch signup success
-      reduxDispatch(signInSuccess(user)); // Dispatch success with user data
-      dispatch({ type: "REGISTRATION_SUCCESS", payload: user }); // Optionally dispatch another success action
+      reduxDispatch(signInSuccess(user));
+      dispatch({ type: "REGISTRATION_SUCCESS", payload: user });
 
       setSuccessMessage("Registration successful");
     } catch (error) {
@@ -71,33 +68,20 @@ export const useSignup = () => {
       setErrorMessage(
         error.response?.data?.message || "Signup failed. Please try again."
       );
-      reduxDispatch(signInFailure(error.response?.data?.message)); // Dispatch failure on error
+      reduxDispatch(signInFailure(error.response?.data?.message));
     } finally {
       setIsLoading(false);
     }
   };
 
   return {
-    username,
-    setUsername,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
+    ...formData,
+    setFormData,
+    handleChange,
     showPassword,
     setShowPassword,
     showConfirmPassword,
     setShowConfirmPassword,
-    gender,
-    setGender,
-    firstName,
-    setFirstName,
-    middleName,
-    setMiddleName,
-    lastName,
-    setLastName,
     errorMessage,
     successMessage,
     isLoading,
