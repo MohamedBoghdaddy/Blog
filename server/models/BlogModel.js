@@ -1,87 +1,50 @@
 import mongoose from "mongoose";
 
-const BlogSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-  url: {
-    type: String,
-    required: true,
-  },
-  version: {
-    type: Number,
-    default: 1,
-  },
-  // Version tracking for content
-  versions: [
-    {
-      versionNumber: Number,
-      content: String,
-      timestamp: {
-        type: Date,
-        default: Date.now,
-      },
-      modifiedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      metadata: String, // Add metadata versioning
+const BlogSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true, index: true },
+    content: { type: String, required: true, trim: true },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-  ],
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    tags: [{ type: String, lowercase: true, trim: true }],
+    likes: { type: Number, default: 0 },
+    comments: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        text: { type: String, required: true, trim: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    versions: [
+      {
+        versionNumber: { type: Number, default: 1 },
+        content: { type: String },
+        timestamp: { type: Date, default: Date.now },
+        modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      },
+    ],
+    deleted: { type: Boolean, default: false },
   },
-  workspace: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Workspace",
-    required: true,
-  },
-  tags: [String],
-  // Access control for blog collaboration
-  accessControl: [
-    {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      permissions: { type: String, enum: ["read", "write", "admin"] },
-    },
-  ],
-  deleted: {
-    type: Boolean,
-    default: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
-// Middleware to handle versioning
+// Indexing for optimized search performance
+BlogSchema.index({ title: "text", tags: "text" });
+
+// Middleware to handle versioning before saving
 BlogSchema.pre("save", function (next) {
-  if (
-    this.isModified("url") ||
-    this.isModified("name") ||
-    this.isModified("metadata")
-  ) {
-    // Push version history for the blog content
+  if (this.isModified("content")) {
     this.versions.push({
-      versionNumber: this.version,
-      content: this.url, // Track the URL of the document
-      timestamp: new Date(),
-      modifiedBy: this.owner, // Track who modified the blog
-      metadata: this.metadata || "", // Track metadata if it was changed
+      versionNumber: this.versions.length + 1,
+      content: this.content,
+      modifiedBy: this.author,
     });
-    this.version += 1; // Auto-increment version number
   }
   next();
 });
 
-// Ensure we don't redefine the model if it already exists
-const Blog = mongoose.models.Blog || mongoose.model("Blog", BlogSchema);
-
+const Blog = mongoose.model("Blog", BlogSchema);
 export default Blog;
